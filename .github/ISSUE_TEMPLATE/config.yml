@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/nguyenhoanhson797/opencode-usage-gui/security/advisories/new
+    about: Report a credential leak or other vulnerability privately. Never paste tokens in an issue.

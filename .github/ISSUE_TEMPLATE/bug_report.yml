@@ -1,0 +1,95 @@
+name: Bug report
+description: Something in the Usage tab or the limits chip is wrong.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. **Do not paste tokens, API keys, credential ids or full Console responses.**
+        Redact account details and usage figures if they are private.
+
+  - type: input
+    id: desktop
+    attributes:
+      label: OpenCode Desktop version
+      description: Find it in Desktop's About dialog or the app's settings.
+      placeholder: "e.g. 2.3.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "e.g. Windows 11, macOS 15, Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install the plugin?
+      options:
+        - opencode plugin add (npm)
+        - opencode plugin add (GitHub)
+        - Local checkout in the global opencode.json(c)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: account
+    attributes:
+      label: Account type
+      description: Do not include the account label or credential id.
+      options:
+        - Console sign-in (OAuth)
+        - Go API key
+        - More than one account
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: The panel/card/chip, the message you saw, and whether the Console website agrees.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a session
+        2. Open the Usage tab
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots or redacted messages
+      description: Never include tokens, credential ids or raw Console JSON.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed tokens, API keys, credential ids and private usage data from this report.
+          required: true

@@ -1,0 +1,9 @@
+# Settings for pnpm 10.16+ live here. These @opencode packages are pinned to the Desktop version
+# this plugin builds against; don't wait out pnpm's release-age gate for them.
+minimumReleaseAgeExclude:
+  - '@opencode/ai@2.3.2'
+  - '@opencode/client@2.3.2'
+  - '@opencode/plugin@2.3.2'
+  - '@opencode/protocol@2.3.2'
+  - '@opencode/schema@2.3.2'
+  - '@opencode/util@2.3.2'

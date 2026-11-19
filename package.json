@@ -1,0 +1,60 @@
+{
+  "name": "opencode-usage-gui",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenCode Go usage and plan limits in an OpenCode Desktop side panel, read from the Console. No local database, no AI tools.",
+  "license": "MIT",
+  "author": "opencode-usage-gui contributors",
+  "homepage": "https://github.com/nguyenhoanhson797/opencode-usage-gui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyenhoanhson797/opencode-usage-gui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nguyenhoanhson797/opencode-usage-gui/issues"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "opencode-desktop",
+    "opencode-go",
+    "desktop",
+    "gui",
+    "usage",
+    "quota",
+    "console"
+  ],
+  "packageManager": "pnpm@11.9.0",
+  "main": "./dist/server/index.js",
+  "exports": {
+    ".": "./dist/server/index.js",
+    "./gui-experimental": "./dist/gui-experimental.cjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "preview": "node scripts/preview.mjs",
+    "pack:check": "npm pack --dry-run",
+    "prepack": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "2.3.2",
+    "@types/node": "^22.20.5",
+    "effect": "4.1.0",
+    "solid-js": "^1.9.12",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0",
+    "vite-plugin-solid": "^2.11.8"
+  }
+}

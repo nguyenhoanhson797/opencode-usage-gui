@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest a change that keeps the plugin Go-only, Console-backed and Desktop-first.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please keep the scope in mind: OpenCode Go, Desktop, Console data, no local history.
+        Provider support, session scanning, TPS/TTFT, model tools and self-update are out of scope.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface?
+      options:
+        - Usage tab
+        - Limits card
+        - Limits chip / hover list
+        - Settings
+        - Documentation / packaging
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or prior art
+      description: Other plugins, Console screens or links that show the idea.
+    validations:
+      required: false
