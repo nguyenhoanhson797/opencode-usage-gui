@@ -40,8 +40,8 @@ Out of scope:
 
 ## Data handling in one paragraph
 
-The plugin sends the Console credential OpenCode already stores to the Console (or the Go usage
-route for an API key), with redirects refused, a 12 s timeout and a 256 KB response cap. It does
-not read the local database or auth files, does not log the credential, does not write config
-files, and does not expose model-callable tools or hooks. The only credential write is OpenCode's
-own `credential.activate`, made when the user picks an account in the Limits card.
+The plugin sends the Console credential OpenCode already stores to the Console, with redirects
+refused, a 12 s timeout and a 256 KB response cap. A Go API key uses the same status route (the
+percent-only usage route is a fallback). It does not read the local database or auth files, does
+not log the credential, does not write config files, never activates a credential, and does not
+expose model-callable tools or hooks.

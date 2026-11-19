@@ -35,9 +35,11 @@ export const en = {
   "limits.weekly": "Weekly",
   "limits.monthly": "Monthly",
   "limits.account": "Account",
+  "limits.account.hint":
+    "One row per Go account. A Console sign-in and API keys for the same subscriber are grouped; remove unused credentials in OpenCode to shorten the list.",
+  "limits.account.loading": "Reading accounts…",
   "limits.account.console": "Console",
   "limits.account.key": "API key",
-  "limits.switchError": "Could not switch account: {{message}}",
   "limits.resets": "Resets in {{when}}",
   "limits.resetsNow": "Resets now",
   "limits.left": "{{percent}}% left",
@@ -67,7 +69,7 @@ export const en = {
   "settings.section.surfaces": "Surfaces",
   "settings.panel": "Usage tab in the side panel",
   "settings.panel.description":
-    "A tab beside each session with the Limits card, ranges, totals and a per-model list. Picking an account in the card switches OpenCode's active credential.",
+    "A tab beside each session with the Limits card, ranges, totals and a per-model list. Picking an account only changes what the tab reads; it never switches OpenCode's active credential.",
   "settings.entry": "Limits chip beside the new-tab button",
   "settings.entry.description":
     "A small ring at the end of the tab strip, next to the new-tab button. Rest the pointer on it to see the 5-hour, weekly and monthly share of every account with a Go plan; click it to open the tab.",
@@ -83,7 +85,7 @@ export const en = {
     "Usage and limits are read from the OpenCode Console with the credential OpenCode already stores. Nothing is read from this machine, and no secret is logged or copied.",
   "settings.privacy": "Privacy",
   "settings.privacy.description":
-    "The only network calls go to OpenCode's Console, for the selected account. Choosing an account asks OpenCode to activate that credential.",
+    "The only network calls go to OpenCode's Console, for the selected account. Choosing an account only changes what the plugin reads; OpenCode's active credential stays as it is.",
 };
 
 export const vi: Record<keyof typeof en, string> = {
@@ -121,9 +123,11 @@ export const vi: Record<keyof typeof en, string> = {
   "limits.weekly": "Tuần",
   "limits.monthly": "Tháng",
   "limits.account": "Tài khoản",
+  "limits.account.hint":
+    "Mỗi tài khoản Go một dòng. Đăng nhập Console và các API key cùng subscriber được gộp; xoá thông tin không dùng trong OpenCode để danh sách gọn hơn.",
+  "limits.account.loading": "Đang đọc tài khoản…",
   "limits.account.console": "Console",
   "limits.account.key": "API key",
-  "limits.switchError": "Không đổi được tài khoản: {{message}}",
   "limits.resets": "Đặt lại sau {{when}}",
   "limits.resetsNow": "Đặt lại ngay",
   "limits.left": "Còn {{percent}}%",
@@ -153,7 +157,7 @@ export const vi: Record<keyof typeof en, string> = {
   "settings.section.surfaces": "Hiển thị",
   "settings.panel": "Tab Sử dụng ở panel bên",
   "settings.panel.description":
-    "Một tab cạnh mỗi phiên, có thẻ Hạn mức, khoảng thời gian, tổng và danh sách theo model. Chọn tài khoản trong thẻ sẽ đổi thông tin đăng nhập đang dùng của OpenCode.",
+    "Một tab cạnh mỗi phiên, có thẻ Hạn mức, khoảng thời gian, tổng và danh sách theo model. Chọn tài khoản chỉ đổi dữ liệu tab đọc; không đổi thông tin đăng nhập đang dùng của OpenCode.",
   "settings.entry": "Chip hạn mức cạnh nút tab mới",
   "settings.entry.description":
     "Vòng tròn nhỏ ở cuối dải tab, cạnh nút tab mới. Rê chuột lên để xem tỉ lệ 5 giờ, tuần và tháng của mọi tài khoản có gói Go; bấm để mở tab.",
@@ -169,5 +173,5 @@ export const vi: Record<keyof typeof en, string> = {
     "Thống kê và hạn mức đọc từ Console của OpenCode bằng thông tin đăng nhập OpenCode đã lưu. Không đọc gì trên máy này, không ghi log hay sao chép bí mật.",
   "settings.privacy": "Quyền riêng tư",
   "settings.privacy.description":
-    "Các lần gọi mạng chỉ đi tới Console của OpenCode, cho tài khoản đang chọn. Chọn tài khoản sẽ nhờ OpenCode kích hoạt thông tin đăng nhập đó.",
+    "Các lần gọi mạng chỉ đi tới Console của OpenCode, cho tài khoản đang chọn. Chọn tài khoản chỉ đổi dữ liệu plugin đọc; thông tin đăng nhập đang dùng của OpenCode giữ nguyên.",
 };

@@ -27,8 +27,6 @@ import {
   createAccountsData,
   createLimitsData,
   createUsageData,
-  errorText,
-  switchAccount,
 } from "./data.js";
 import { formatCost, formatCount, formatDay, formatDayFull, formatTokens, formatUntil } from "./format.js";
 
@@ -67,9 +65,6 @@ function Card(props: { title: string; subtitle: string; children: JSX.Element })
           <h3 class="ou-card-title">{props.title}</h3>
           <p class="ou-card-sub">{props.subtitle}</p>
         </div>
-        <span class="ou-chevron" aria-hidden="true">
-          ›
-        </span>
       </header>
       <div class="ou-card-body">{props.children}</div>
     </section>
@@ -138,9 +133,12 @@ function LimitRow(props: { ctx: Context; window: QuotaWindow }) {
 }
 
 function accountLabel(ctx: Context, account: QuotaAccount): string {
-  const kind = ctx.t(
-    account.method === "console" ? "limits.account.console" : "limits.account.key",
-  );
+  const methods = account.methods?.length ? account.methods : [account.method];
+  const kind = methods
+    .map((method) =>
+      ctx.t(method === "console" ? "limits.account.console" : "limits.account.key"),
+    )
+    .join(" + ");
   return `${account.label} · ${kind}`;
 }
 
@@ -150,8 +148,8 @@ function LimitsCard(props: {
   report: () => QuotaReport | undefined;
   loading: () => boolean;
   accounts: () => QuotaAccounts | undefined;
+  accountsLoading: () => boolean;
   selected: () => string;
-  switching: () => boolean;
   onAccount: (id: string) => void;
 }) {
   const message = () => {
@@ -183,19 +181,28 @@ function LimitsCard(props: {
           <h3 class="ou-card-title">{props.ctx.t("card.limits")}</h3>
           <p class="ou-card-sub">{props.ctx.t("card.limits.sub")}</p>
         </div>
-        <span class="ou-chevron" aria-hidden="true">
-          ›
-        </span>
       </header>
       <div class="ou-card-body">
+        <Show when={props.accountsLoading() && !props.accounts()}>
+          <div class="ou-account">
+            <span class="ou-account-label" title={props.ctx.t("limits.account.hint")}>
+              {props.ctx.t("limits.account")}
+            </span>
+            <span class="ou-account-loading">
+              <props.ctx.ui.Loader size="small" />
+              {props.ctx.t("limits.account.loading")}
+            </span>
+          </div>
+        </Show>
         <Show when={(props.accounts()?.accounts.length ?? 0) > 1}>
           <label class="ou-account">
-            <span class="ou-account-label">{props.ctx.t("limits.account")}</span>
+            <span class="ou-account-label" title={props.ctx.t("limits.account.hint")}>
+              {props.ctx.t("limits.account")}
+            </span>
             <select
               ref={select}
               class="ou-account-select"
               value={props.selected()}
-              disabled={props.switching()}
               onChange={(event) => props.onAccount(event.currentTarget.value)}
             >
               <For each={props.accounts()?.accounts ?? []}>
@@ -204,7 +211,7 @@ function LimitsCard(props: {
                 )}
               </For>
             </select>
-            <Show when={props.switching()}>
+            <Show when={props.accountsLoading()}>
               <props.ctx.ui.Loader size="small" />
             </Show>
           </label>
@@ -429,7 +436,6 @@ export function UsagePanel(props: UsagePanelProps) {
   const data = createUsageData(ctx, () => directoryOf(props.session()));
   const accounts = createAccountsData(ctx);
   const [selected, setSelected] = createSignal("");
-  const [switching, setSwitching] = createSignal(false);
   const limits = createLimitsData(
     ctx,
     () => directoryOf(props.session()),
@@ -482,25 +488,16 @@ export function UsagePanel(props: UsagePanelProps) {
     reloadUsage();
   });
 
-  const changeAccount = async (id: string) => {
+  /**
+   * Changes the account the tab reads. This is a view change only: it never activates a
+   * credential in OpenCode, so the running session keeps its current provider.
+   */
+  const changeAccount = (id: string) => {
     if (!id || id === selected()) return;
-    const previous = selected();
     setSelected(id);
     props.onAccount(id);
-    setSwitching(true);
-    try {
-      await switchAccount(ctx, id, directoryOf(props.session()));
-      void limits.load(true);
-      reloadUsage();
-    } catch (failure) {
-      setSelected(previous);
-      props.onAccount(previous);
-      ctx.toast.show({
-        title: ctx.t("limits.switchError", { message: errorText(failure) }),
-      });
-    } finally {
-      setSwitching(false);
-    }
+    reloadLimits(true);
+    reloadUsage();
   };
 
   const timer = setInterval(() => {
@@ -572,9 +569,9 @@ export function UsagePanel(props: UsagePanelProps) {
         report={limits.report}
         loading={limits.loading}
         accounts={accounts.report}
+        accountsLoading={accounts.loading}
         selected={selected}
-        switching={switching}
-        onAccount={(id) => void changeAccount(id)}
+        onAccount={(id) => changeAccount(id)}
       />
 
       <Show when={stateMessage()}>
@@ -585,7 +582,14 @@ export function UsagePanel(props: UsagePanelProps) {
 
       <Show
         when={totals()}
-        fallback={<Show when={!stateMessage()}><p class="ou-muted">{ctx.t("panel.loading")}</p></Show>}
+        fallback={
+          <Show when={!stateMessage()}>
+            <p class="ou-muted ou-loading-row">
+              <ctx.ui.Loader size="small" />
+              {ctx.t("panel.loading")}
+            </p>
+          </Show>
+        }
       >
         {(sums) => (
           <>

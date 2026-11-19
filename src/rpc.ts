@@ -25,8 +25,6 @@ export type AllLimitsInput = { refresh?: boolean };
 export type AllLimitsOutput = { entries: QuotaAccountLimits[] };
 export type AccountsInput = Record<string, never>;
 export type AccountsOutput = { accounts: QuotaAccounts };
-export type SwitchInput = { accountID: string };
-export type SwitchOutput = { switched: true };
 
 type StandardValueSchema = Extract<Rpc.PortableValueSchema, { "~standard": unknown }>;
 type Typed<T> = { "~standard": { types?: { input: T; output: T } } };
@@ -121,17 +119,6 @@ function checkAccountsOutput(value: unknown): string | null {
   return isRecord(value) && isRecord(value.accounts) ? null : "output must carry accounts";
 }
 
-function checkSwitchInput(value: unknown): string | null {
-  if (!isRecord(value) || !isCredentialID(value.accountID)) {
-    return "accountID must be a credential id";
-  }
-  return null;
-}
-
-function checkSwitchOutput(value: unknown): string | null {
-  return isRecord(value) && value.switched === true ? null : "output must carry switched";
-}
-
 export const UsageRpc = {
   id: USAGE_RPC_ID,
   // No events: the window asks when it mounts, on a range change and on a timer.
@@ -152,10 +139,6 @@ export const UsageRpc = {
     accounts: {
       input: inputSchema<AccountsInput>(() => null),
       output: schema<AccountsOutput>(checkAccountsOutput),
-    },
-    switch: {
-      input: schema<SwitchInput>(checkSwitchInput),
-      output: schema<SwitchOutput>(checkSwitchOutput),
     },
   },
 } satisfies Rpc.PortableDefinition;

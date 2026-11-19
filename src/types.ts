@@ -79,6 +79,8 @@ export type QuotaLimits = {
   fetchedAtMs: number;
   /** The plan's end date, when the Console reports one. */
   planEndsAt?: string;
+  /** The Console's stable subscriber id, used to group credentials of one account. */
+  subscriberID?: string;
 };
 
 /**
@@ -104,6 +106,11 @@ export type QuotaAccount = {
   integrationID: "opencode" | "opencode-go";
   /** The active credential of its integration. */
   active: boolean;
+  /**
+   * Every method this account is connected with, preferred first. A Console sign-in and one or
+   * more Go API keys that resolve to the same subscriber id form one account.
+   */
+  methods?: QuotaAccountMethod[];
 };
 
 /** The answer of the RPC's `accounts` method. */

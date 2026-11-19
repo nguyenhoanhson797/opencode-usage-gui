@@ -12,10 +12,12 @@ First public release.
 
 - Desktop Usage tab with the OpenCode Go Limits card, daily chart, totals and per-model requests.
 - Ranges: today, 7d, 30d, month and the whole plan period.
-- Account picker for every Console sign-in and Go API key OpenCode stores.
+- Account picker for every Console sign-in and Go API key OpenCode stores, grouped by Console
+  subscriber id so one Go account is one row even when both connect methods exist.
 - Limits chip beside the new-tab button with a progress ring and a hover list of all accounts
   that have a Go plan.
 - Settings page for surface switches, default range and the chip's window.
+- Loading states for the account list, limits and the chip's first read.
 - English and Vietnamese copy.
 - Static preview renderer (`pnpm preview`) and README screenshots for the side panel, limits chip
   and Settings page.
@@ -29,6 +31,9 @@ First public release.
 
 ### Changed
 
+- Account selection is a read-only view change: it never activates an OpenCode credential and
+  never changes the running session.
+- Removed the decorative chevrons from the Limits, Totals and Models cards.
 - Forked from `opencode-quota` and reduced to the OpenCode Go Desktop surface.
 
 [0.1.0]: https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/tag/v0.1.0

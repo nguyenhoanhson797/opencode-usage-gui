@@ -60,7 +60,8 @@ To add an RPC: add the shape to `types.ts`, the schema and method to `rpc.ts`, t
 - Do not add a network host, redirect following, or an unbounded response read.
 - Do not add model-callable tools, prompts, session hooks or self-update code.
 - Do not write `opencode.json`, `settings.jsonc` or export files.
-- The only credential write allowed is `credential.activate` for an account the user picked.
+- Do not activate or edit credentials. The account picker is a read-only view change; the plugin
+  never calls `credential.activate`.
 
 ## Pull requests
 

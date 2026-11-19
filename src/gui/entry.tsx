@@ -49,7 +49,10 @@ function EntryTooltip(props: {
     <Show
       when={props.entries()}
       fallback={
-        <span class="ou-chip-note">
+        <span class="ou-chip-note ou-loading-row">
+          <Show when={props.loading()}>
+            <props.ctx.ui.Loader size="small" />
+          </Show>
           {props.ctx.t(props.loading() ? "limits.loading" : "limits.unavailable")}
         </span>
       }
@@ -199,25 +202,32 @@ export function QuotaEntry(props: {
         >
           <span class="ou-entry-label">{ctx.t(`entry.short.${props.window()}`)}</span>
           <span class="ou-entry-ring" aria-hidden="true">
-            <svg viewBox="0 0 14 14">
-              <circle class="ou-ring-track" cx="7" cy="7" r={RING_RADIUS} />
-              <Show when={percent() !== undefined}>
-                <circle
-                  class="ou-ring-fill"
-                  classList={{
-                    "ou-warn": (percent() ?? 0) >= 75 && (percent() ?? 0) < 100,
-                    "ou-full": (percent() ?? 0) >= 100,
-                  }}
-                  cx="7"
-                  cy="7"
-                  r={RING_RADIUS}
-                  style={{
-                    "stroke-dasharray": `${RING_CIRCUMFERENCE}`,
-                    "stroke-dashoffset": `${ringOffset()}`,
-                  }}
-                />
-              </Show>
-            </svg>
+            <Show
+              when={data.loading() && percent() === undefined}
+              fallback={
+                <svg viewBox="0 0 14 14">
+                  <circle class="ou-ring-track" cx="7" cy="7" r={RING_RADIUS} />
+                  <Show when={percent() !== undefined}>
+                    <circle
+                      class="ou-ring-fill"
+                      classList={{
+                        "ou-warn": (percent() ?? 0) >= 75 && (percent() ?? 0) < 100,
+                        "ou-full": (percent() ?? 0) >= 100,
+                      }}
+                      cx="7"
+                      cy="7"
+                      r={RING_RADIUS}
+                      style={{
+                        "stroke-dasharray": `${RING_CIRCUMFERENCE}`,
+                        "stroke-dashoffset": `${ringOffset()}`,
+                      }}
+                    />
+                  </Show>
+                </svg>
+              }
+            >
+              <span class="ou-spinner" />
+            </Show>
           </span>
         </button>
       </ctx.ui.Tooltip>

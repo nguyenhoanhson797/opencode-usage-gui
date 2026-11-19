@@ -2,14 +2,18 @@
  * OpenCode Go plan limits: the rolling five-hour, weekly and monthly windows.
  *
  * An account is a credential OpenCode already stores:
- * - a Console sign-in (`opencode` integration, OAuth), read from `<console>/api/go/status`.
- *   It works for fresh accounts and carries the plan's end date;
- * - a Go API key (`opencode-go` integration, key), read from `zen/go/v1/usage`.
+ * - a Console sign-in (`opencode` integration, OAuth), read from `<console>/api/go/status`;
+ * - a Go API key (`opencode-go` integration, key), read from the same status route, which also
+ *   accepts a key and reports the subscriber id. The key's percent-only usage route is a fallback.
  *
- * The account list comes from OpenCode's integration API, which owns the credentials. The same
- * API resolves the one the user picks and activates it, so a switch here is a switch for
- * OpenCode too. This plugin never opens the credential table, never writes it and never logs a
- * secret: a failure carries a short message with the credential replaced by `[redacted]`.
+ * Credentials that resolve to the same Console subscriber id are one account: a Console sign-in
+ * and one or more keys for the same Go plan are grouped in the picker and the chip, while their
+ * individual credential ids still work when reading one account.
+ *
+ * The account list comes from OpenCode's integration API, which owns the credentials and
+ * resolves the one the user picks. This plugin never opens the credential table, never writes
+ * it, never activates a credential and never logs a secret: a failure carries a short message
+ * with the credential replaced by `[redacted]`.
  *
  * A request goes to the OpenCode Console only (an `https` server from the login's metadata,
  * else opencode.ai), without following redirects, with a timeout and a small response cap.
@@ -294,29 +298,80 @@ async function scanAccounts(ctx: Plugin.Context): Promise<Scan> {
   return { entries, defaultID: preferred?.account.id };
 }
 
-export async function listAccounts(ctx: Plugin.Context): Promise<QuotaAccounts> {
-  const scan = await scanAccounts(ctx);
+/** Picker order: a Console sign-in first, then an active credential, then the label. */
+function accountRank(account: QuotaAccount): number {
+  return (account.method === "console" ? 0 : 2) + (account.active ? 0 : 1);
+}
+
+/** Every method in a group, once, Console first. */
+function methodList(entries: QuotaAccountLimits[]): QuotaAccountMethod[] {
+  const methods: QuotaAccountMethod[] = [];
+  for (const entry of entries) {
+    if (!methods.includes(entry.account.method)) methods.push(entry.account.method);
+  }
+  return methods.sort((a, b) => (a === "console" ? -1 : b === "console" ? 1 : 0));
+}
+
+/**
+ * One row per Console subscriber: a Console sign-in and the Go API keys that resolve to the same
+ * subscriber id are one account. A reply without a subscriber id stays on its own, so an
+ * unreachable credential never disappears into another account.
+ */
+export function groupAccountLimits(entries: QuotaAccountLimits[]): QuotaAccountLimits[] {
+  const groups = new Map<string, QuotaAccountLimits[]>();
+  for (const entry of entries) {
+    const subscriberID = entry.report.limits?.subscriberID;
+    const key = subscriberID ? `subscriber:${subscriberID}` : `credential:${entry.account.id}`;
+    const group = groups.get(key);
+    if (group) group.push(entry);
+    else groups.set(key, [entry]);
+  }
+
+  const result: QuotaAccountLimits[] = [];
+  for (const group of groups.values()) {
+    const sorted = [...group].sort(
+      (a, b) =>
+        accountRank(a.account) - accountRank(b.account) ||
+        a.account.label.localeCompare(b.account.label),
+    );
+    const representative = sorted[0];
+    result.push({
+      account: {
+        ...representative.account,
+        active: sorted.some((entry) => entry.account.active),
+        methods: methodList(sorted),
+      },
+      report: representative.report,
+    });
+  }
+
+  result.sort(
+    (a, b) =>
+      accountRank(a.account) - accountRank(b.account) ||
+      a.account.label.localeCompare(b.account.label),
+  );
+  return result;
+}
+
+export async function listAccounts(
+  ctx: Plugin.Context,
+  signal?: AbortSignal,
+): Promise<QuotaAccounts> {
+  const entries = await readAllLimits(ctx, signal ? { signal } : {});
+  const accounts = entries.map((entry) => entry.account);
+  const preferred =
+    accounts.find((account) => account.method === "console" && account.active) ??
+    accounts.find((account) => account.active) ??
+    accounts[0];
   return {
-    accounts: scan.entries.map((entry) => entry.account),
-    ...(scan.defaultID ? { defaultID: scan.defaultID } : {}),
+    accounts,
+    ...(preferred ? { defaultID: preferred.id } : {}),
   };
 }
 
 /**
- * Makes `accountID` the active credential of its integration. Only ids this plugin listed are
- * accepted, so the call can never switch some unrelated integration.
+ * The Console sign-in an account reads through: the token and where to send it.
  */
-export async function switchAccount(ctx: Plugin.Context, accountID: string): Promise<void> {
-  const scan = await scanAccounts(ctx);
-  const entry = scan.entries.find((candidate) => candidate.account.id === accountID);
-  if (!entry) throw new Error("That account is no longer connected.");
-  if (entry.account.active) return;
-  await ctx.credential.activate({ credentialID: accountID });
-  // The account list and the chip must reflect the switch at once.
-  for (const key of cache.keys()) cache.delete(key);
-}
-
-/** The Console sign-in an account reads through: the token and where to send it. */
 export type ConsoleAccess = {
   access: string;
   server?: string;
@@ -395,7 +450,7 @@ export async function getConsoleJson(
 }
 
 /** The Console's `/api/go/status`: `access.meters.fiveHour|week|month`, each in microcents. */
-function parseConsole(json: unknown): QuotaReport | undefined {
+function parseConsole(json: unknown, source: "console" | "key"): QuotaReport | undefined {
   if (!isRecord(json)) return undefined;
   if (json.access === null || json.access === undefined) return { state: "not-subscribed" };
   if (!isRecord(json.access)) return undefined;
@@ -417,10 +472,15 @@ function parseConsole(json: unknown): QuotaReport | undefined {
     windows.push(windowRow(key, percentOf(used, limit), resetsAt));
   }
 
+  const subscriberID =
+    typeof json.subscriberUserId === "string" && json.subscriberUserId !== ""
+      ? json.subscriberUserId
+      : undefined;
   const limits: QuotaLimits = {
-    source: "console",
+    source,
     windows,
     fetchedAtMs: Date.now(),
+    ...(subscriberID ? { subscriberID } : {}),
     ...(endsAt ? { planEndsAt: endsAt } : {}),
   };
   return { state: "ok", limits };
@@ -453,6 +513,7 @@ async function queryConsole(
   access: string,
   server: string | undefined,
   orgID: string | undefined,
+  source: "console" | "key",
   signal?: AbortSignal,
 ): Promise<QuotaReport> {
   const headers: Record<string, string> = {
@@ -474,11 +535,20 @@ async function queryConsole(
     return { state: "error", message: clean(reply.message, access) };
   }
   return (
-    parseConsole(reply.json) ?? { state: "error", message: "The Console reply did not have the meters" }
+    parseConsole(reply.json, source) ?? {
+      state: "error",
+      message: "The Console reply did not have the meters",
+    }
   );
 }
 
 async function queryKey(key: string, signal?: AbortSignal): Promise<QuotaReport> {
+  // The Console status route accepts a Go API key and reports the subscriber id, so a key and a
+  // Console sign-in of the same account can be grouped. Fall back to the key's own usage route
+  // if the status route does not answer with meters.
+  const status = await queryConsole(key, undefined, undefined, "key", signal);
+  if (status.state !== "error") return status;
+
   const reply = await getJson(GO_USAGE_URL, { Authorization: `Bearer ${key}` }, key, signal);
   if (!reply.ok) {
     if (reply.notSubscribed) {
@@ -518,7 +588,7 @@ async function readEntry(
       isRecord(metadata) && typeof metadata[key] === "string"
         ? (metadata[key] as string)
         : undefined;
-    return await queryConsole(value.access, text("server"), text("orgID"), signal);
+    return await queryConsole(value.access, text("server"), text("orgID"), "console", signal);
   }
   return { state: "error", message: "That credential cannot read OpenCode Go limits." };
 }
@@ -563,14 +633,15 @@ export async function readLimits(
 /**
  * Read every stored credential's plan windows, so the chip can list all the accounts that
  * answer with a Go plan on hover. The scan runs once, then each account is read in parallel
- * and cached like `readLimits`, so a repeated hover asks the Console only for expired answers.
+ * and cached like `readLimits`; the results are grouped by subscriber id so one Go account is
+ * one row even when a Console sign-in and API keys reach it.
  */
 export async function readAllLimits(
   ctx: Plugin.Context,
   options: { force?: boolean; signal?: AbortSignal } = {},
 ): Promise<QuotaAccountLimits[]> {
   const scan = await scanAccounts(ctx);
-  return await Promise.all(
+  const entries = await Promise.all(
     scan.entries.map(async (entry) => {
       const cacheKey = entry.account.id;
       const cached = cachedReport(cacheKey, options.force === true);
@@ -581,4 +652,5 @@ export async function readAllLimits(
       return { account: entry.account, report };
     }),
   );
+  return groupAccountLimits(entries);
 }

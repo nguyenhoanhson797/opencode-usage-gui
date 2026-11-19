@@ -182,7 +182,6 @@ function card(title, subtitle, body) {
   return `<section class="ou-card">
     <header class="ou-card-head">
       <div><h3 class="ou-card-title">${title}</h3><p class="ou-card-sub">${subtitle}</p></div>
-      <span class="ou-chevron" aria-hidden="true">›</span>
     </header>
     <div class="ou-card-body">${body}</div>
   </section>`;
@@ -211,9 +210,8 @@ const limitsCard = card(
   `<label class="ou-account">
     <span class="ou-account-label">Account</span>
     <select class="ou-account-select">
-      <option>Personal · Console</option>
-      <option>Default · Console</option>
-      <option>OpenCode Go · API key</option>
+      <option>Personal · Console + API key</option>
+      <option>Work · Console</option>
     </select>
   </label>
   <div class="ou-limits-rows">${limitWindows
@@ -360,8 +358,7 @@ const chipTip = `<div class="ou-chip-tip">
     <thead><tr><th scope="col">Account</th><th scope="col" class="ou-chip-num">5h</th><th scope="col" class="ou-chip-num">7d</th><th scope="col" class="ou-chip-num">1mo</th></tr></thead>
     <tbody>
       <tr class="ou-chip-row-on"><th scope="row" class="ou-chip-account">Personal</th><td class="ou-chip-num">14%</td><td class="ou-chip-num">9%</td><td class="ou-chip-num ou-warn">94%</td></tr>
-      <tr><th scope="row" class="ou-chip-account">Work · Console</th><td class="ou-chip-num ou-full">100%</td><td class="ou-chip-num">42%</td><td class="ou-chip-num">63%</td></tr>
-      <tr><th scope="row" class="ou-chip-account">Go API key</th><td class="ou-chip-num">3%</td><td class="ou-chip-num">8%</td><td class="ou-chip-num">12%</td></tr>
+      <tr><th scope="row" class="ou-chip-account">Work</th><td class="ou-chip-num ou-full">100%</td><td class="ou-chip-num">42%</td><td class="ou-chip-num">63%</td></tr>
     </tbody>
   </table>
 </div>`;
@@ -404,7 +401,7 @@ writeFileSync(path.join(root, "preview/chip.html"), chip, "utf8");
 const settingsRows = [
   {
     title: "Usage tab in the side panel",
-    desc: "A tab beside each session with the Limits card, ranges, totals and a per-model list. Picking an account in the card switches OpenCode's active credential.",
+    desc: "A tab beside each session with the Limits card, ranges, totals and a per-model list. Picking an account only changes what the tab reads; it never switches OpenCode's active credential.",
     control: '<span class="switch"><i></i></span>',
   },
   {
@@ -498,7 +495,7 @@ ${readCss()}
           <div><div class="settings-title">Source</div><div class="settings-plain">Usage and limits are read from the OpenCode Console with the credential OpenCode already stores. Nothing is read from this machine, and no secret is logged or copied.</div></div>
         </div>
         <div class="settings-row">
-          <div><div class="settings-title">Privacy</div><div class="settings-plain">The only network calls go to OpenCode's Console, for the selected account. Choosing an account asks OpenCode to activate that credential.</div></div>
+          <div><div class="settings-title">Privacy</div><div class="settings-plain">The only network calls go to OpenCode's Console, for the selected account. Choosing an account only changes what the plugin reads; OpenCode's active credential stays as it is.</div></div>
         </div>
       </section>
     </main>

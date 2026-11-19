@@ -22,10 +22,10 @@ local session/TPS dashboard; see [How it differs](#how-it-differs).
   amber then red), a green daily line chart with a hover tooltip (date, tokens, requests, cost),
   then equal-width cards for the window's **Totals** (tokens, requests, cost) and the plan's
   **Models** (share by requests). Ranges: today / 7d / 30d / month / plan.
-- **Account picker** when OpenCode stores more than one Go-capable credential. It lists every
-  Console sign-in and Go API key; picking one reads that account's plan and usage. Picking also
-  makes it OpenCode's active credential, so new requests use it. Only a Console sign-in can read
-  usage history; a Go API key reads limits only.
+- **Account picker** when OpenCode stores more than one Go account. A Console sign-in and one or
+  more Go API keys that resolve to the same Console subscriber are shown as **one row** with both
+  methods; picking it reads that account's plan and usage. Only a Console sign-in can read usage
+  history; a Go API key reads limits alone, so the cards say so for a key-only account.
 - **Limits chip** at the end of the side panel's tab strip, beside the new-tab **+**: a small
   progress ring for the 5-hour, weekly or monthly window you choose, plus a short label. Rest the
   pointer on it to see all three windows for **every** account that has a Go plan; click it to
@@ -33,6 +33,8 @@ local session/TPS dashboard; see [How it differs](#how-it-differs).
 - **Command** “Open usage” in the command palette, and `/usage` in the composer.
 - **Settings page** (Settings → Usage): turn each surface on or off, pick the range the tab
   opens with, pick the window the chip measures, and read where the numbers come from.
+- **Loading states** instead of empty cards: the tab shows a spinner while accounts and limits
+  are read, and the chip spins until its first answer. Refreshes keep the last numbers visible.
 - **Responsive** inside Desktop: one-column cards under 480 px, an even 50/50 grid at and above
   480 px, a shorter chart on narrow widths, and a narrow-screen menu view for the Usage tab.
 
@@ -128,8 +130,8 @@ To disable everything, remove the entry (or prefix its id with `-` in the plugin
 | Range the tab opens with | Today, 7d, 30d, month or the whole plan period. |
 | Data source / Privacy | A short explanation of the Console endpoints and credential handling. |
 
-Picking an account in the Limits card changes **OpenCode's active credential**, not just the
-plugin's view. That is intentional: it makes the number you see match what new requests will use.
+Picking an account in the Limits card changes **only what the plugin reads**. It does not change
+OpenCode's active credential, so the running session keeps its current provider and model.
 
 ## How it differs
 
@@ -156,6 +158,9 @@ Console's Go endpoints do not expose them.
 - **Console sign-in needed for history.** A Go API key can read limits only.
 - **One account at a time in the tab.** The Limits card reads the selected account. The chip's
   hover list is the all-account comparison.
+- **Grouped by subscriber id.** A Console sign-in and the Go API keys that resolve to the same
+  Console subscriber are one row. A key whose status route fails falls back to its percent-only
+  usage route, so it cannot be matched and may appear separately.
 - **Numbers can lag.** Limits are cached for a minute (ten seconds after a failure); usage for a
   minute per account and range. The tab refreshes every five minutes and has a manual refresh
   button.
@@ -165,9 +170,9 @@ Console's Go endpoints do not expose them.
 
 | Guarantee | How |
 | --- | --- |
-| Only OpenCode's endpoints | `GET {console}/api/go/status` and `GET {console}/api/activity/go` for a Console account, or `https://opencode.ai/zen/go/v1/usage` for a Go API key. Redirects are refused; every call has a 12 s timeout and a 256 KB cap. No other host is contacted. |
+| Only OpenCode's endpoints | `GET {console}/api/go/status` for plan limits, with either a Console sign-in or a Go API key; `GET {console}/api/activity/go` for Console history; `https://opencode.ai/zen/go/v1/usage` only as a fallback for a key. Redirects are refused; every call has a 12 s timeout and a 256 KB cap. No other host is contacted. |
 | Credentials stay OpenCode's | The token/key is resolved through OpenCode's integration API (`ctx.integration.connection`); the plugin never opens the credential table or auth files and never logs a secret. Error messages have the credential replaced with `[redacted]`. |
-| One credential write, on request | Picking an account calls OpenCode's own `credential.activate` with an id the plugin just listed. Nothing else changes OpenCode's credentials. |
+| No credential writes | Picking an account changes only what the plugin reads. It never calls `credential.activate` and never changes OpenCode's active credential or the running session. |
 | No usage history on disk | The plugin does not open SQLite or auth files. Its only local state is its own UI prefs (surface switches, range, chip window, account pick). |
 | No config edits | No `opencode.json`, `settings.jsonc` or export file is written. |
 | No AI surface | No model tools, no session/context hooks, no messages posted into the chat. The model cannot call or see the plugin. |
@@ -203,6 +208,7 @@ injection, and the TUI/CLI parts.
 | Empty chart | The Console returned no daily rows for that plan period yet. |
 | Chip is missing | Enable both the Usage tab and the chip in Settings → Usage. |
 | Numbers feel stale | Wait for the one-minute cache, press the tab's refresh button, or move the pointer over the chip to refresh expired answers. |
+| Duplicate-looking accounts in the picker | The plugin groups a Console sign-in and Go API keys that resolve to the same Console subscriber into one row. If two rows remain, they are different subscribers (or a key's status route failed and it could not be matched); remove unused credentials in OpenCode. The selected value plus its highlighted option can also look duplicated. |
 | Updated a source checkout, still old | Rebuild, then **restart Desktop** for server changes. Window changes reload on rebuild; the server part loads once per app start. |
 | Web/mobile client shows no GUI | GUI bundles are loaded by Desktop, not by the separate web/mobile client. |
 
@@ -235,7 +241,7 @@ Notes for contributors:
 
 A quick manual check before a release: typecheck, build, `pnpm pack:check`, install the packed
 tarball in a fresh profile, open a Console account, a Go API-key account, an account without Go,
-and a second account, then verify the tab, chip hover, range buttons, account switch and refresh.
+and a second account, then verify the tab, chip hover, range buttons, account picker and refresh.
 
 ## Project structure
 
@@ -250,7 +256,7 @@ src/
   server/
     index.ts              plugin object: one rpc.register
     activity.ts           Console activity: parse, ranges, totals, cache
-    quota.ts              Console sign-ins, limits, account switching
+    quota.ts              Console sign-ins, limits, account grouping
   gui/
     index.tsx             tab, chip, command, menu item, settings page
     panel.tsx             Usage tab and Limits card

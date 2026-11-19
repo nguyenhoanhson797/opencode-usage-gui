@@ -106,7 +106,6 @@ export const STYLE = `
 .ou-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .ou-card-title { margin: 0; font-size: 14px; font-weight: 600; }
 .ou-card-sub { margin: 2px 0 0; color: var(--ou-muted); font-size: 12px; }
-.ou-chevron { color: var(--ou-muted); font-size: 15px; line-height: 1; }
 .ou-card-body { margin-top: 10px; display: flex; flex-direction: column; gap: 9px; }
 .ou-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 13px; }
 .ou-row-label { color: var(--ou-text-2); min-width: 0; }
@@ -124,7 +123,9 @@ export const STYLE = `
 
 .ou-limits .ou-card-body { gap: 11px; }
 .ou-account { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ou-account-label { color: var(--ou-muted); font-size: 11px; white-space: nowrap; }
+.ou-account-label { color: var(--ou-muted); font-size: 11px; white-space: nowrap; cursor: help; }
+.ou-account-loading { display: inline-flex; align-items: center; gap: 6px; color: var(--ou-muted); font-size: 12px; }
+.ou-loading-row { display: flex; align-items: center; gap: 8px; margin: 0; }
 .ou-account-select { flex: 1; min-width: 0; height: 26px; padding: 0 6px; border-radius: 6px;
   border: 1px solid var(--ou-card-border); background: var(--ou-track); color: var(--ou-text);
   font: inherit; font-size: 12px; }
@@ -147,9 +148,12 @@ export const STYLE = `
   white-space: nowrap; }
 .ou-entry:hover { color: var(--ou-text); background: var(--surface-base-hover, rgba(127,127,127,.12)); }
 .ou-entry-label { color: var(--ou-muted); }
-.ou-entry-ring { display: inline-flex; width: 14px; height: 14px; flex: none; }
+.ou-entry-ring { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; flex: none; }
 .ou-entry-ring svg { display: block; width: 14px; height: 14px; transform: rotate(-90deg); }
 .ou-entry-ring circle { fill: none; stroke-width: 2.2; }
+.ou-spinner { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--ou-track);
+  border-top-color: var(--ou-green); animation: ou-spin .8s linear infinite; }
+@keyframes ou-spin { to { transform: rotate(360deg); } }
 .ou-ring-track { stroke: var(--ou-track); }
 .ou-ring-fill { stroke: var(--ou-green); stroke-linecap: round; transition: stroke-dashoffset .3s ease; }
 .ou-ring-fill.ou-warn { stroke: #d97706; }

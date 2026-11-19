@@ -22,7 +22,6 @@ type RpcMethods = {
   limits(input: LimitsInput, options?: CallOptions): Promise<{ limits: QuotaReport }>;
   limitsAll(input: AllLimitsInput, options?: CallOptions): Promise<{ entries: QuotaAccountLimits[] }>;
   accounts(input: Record<string, never>, options?: CallOptions): Promise<{ accounts: QuotaAccounts }>;
-  switch(input: { accountID: string }, options?: CallOptions): Promise<{ switched: true }>;
 };
 
 const RPC_TIMEOUT_MS = 60_000;
@@ -196,13 +195,4 @@ export function createAccountsData(ctx: Context): AccountsData {
       }
     },
   };
-}
-
-/** Makes an account the active one in OpenCode; rejects with the server's reason. */
-export async function switchAccount(
-  ctx: Context,
-  accountID: string,
-  directory?: string,
-): Promise<void> {
-  await methods(ctx).switch({ accountID }, options(directory));
 }
