@@ -1,8 +1,8 @@
 # OpenCode Go Usage (Desktop GUI)
 
-![Usage tab in OpenCode Desktop: Go plan limits, a daily token chart with a hover tooltip, totals and per-model requests](docs/usage-panel.png)
+![Side panel: Go plan limits, a daily token chart with a hover tooltip, totals and per-model requests](docs/usage-panel.png)
 
-<sub>Preview rendered from fixed sample data, not a live account.</sub>
+<sub>Side panel · rendered from fixed sample data, not a live account.</sub>
 
 **OpenCode Go usage and plan limits, in a real OpenCode Desktop side panel.** The limits card,
 the daily Console chart, totals, per-model requests and a tab-strip ring, all read from the same
@@ -35,6 +35,20 @@ local session/TPS dashboard; see [How it differs](#how-it-differs).
   opens with, pick the window the chip measures, and read where the numbers come from.
 - **Responsive** inside Desktop: one-column cards under 480 px, an even 50/50 grid at and above
   480 px, a shorter chart on narrow widths, and a narrow-screen menu view for the Usage tab.
+
+## Screenshots
+
+**Limits chip** — the progress ring in the tab strip. Hovering lists every account with a Go
+plan, with all three windows.
+
+![Limits chip with its hover list of Go accounts](docs/usage-chip.png)
+
+**Settings** — surfaces, the default range, and which window the chip measures.
+
+![Usage settings page](docs/usage-settings.png)
+
+The side panel is the image at the top of this page. All screenshots are rendered from fixed
+sample data by `pnpm preview`, not from live accounts.
 
 ## Requirements
 
@@ -158,7 +172,7 @@ Console's Go endpoints do not expose them.
 | No config edits | No `opencode.json`, `settings.jsonc` or export file is written. |
 | No AI surface | No model tools, no session/context hooks, no messages posted into the chat. The model cannot call or see the plugin. |
 | No self-update | The plugin never downloads or executes code. Updates are `opencode plugin update` (or your package manager), run by you. |
-| Local-only preview | `pnpm preview` writes `preview/panel.html` from fixed sample data and never touches the network. |
+| Local-only preview | `pnpm preview` writes `preview/*.html` from fixed sample data and never touches the network. |
 
 ### Removed from the upstream plugin
 
@@ -200,7 +214,7 @@ Requires Node.js 22.12+ (Vite 7) and pnpm 11 (the repo pins the package manager)
 pnpm install       # installs dev deps
 pnpm typecheck     # tsc --noEmit
 pnpm build         # dist/server/*.js + dist/gui-experimental.cjs
-pnpm preview       # preview/panel.html with fixed sample data, no network
+pnpm preview       # preview/*.html with fixed sample data, no network
 pnpm pack:check    # npm pack --dry-run
 ```
 
@@ -212,8 +226,8 @@ Notes for contributors:
   modules (Solid, Effect, `@opencode/plugin/gui`) external; do not bundle your own copies.
 - The server part loads once per Desktop start. After changing `src/server/**`, restart Desktop;
   window changes reload when the bundle is rebuilt.
-- The preview is a styling aid: its markup mirrors `src/gui/panel.tsx`, so update both when the
-  panel changes. It uses sample data only.
+- The preview is a styling aid: its markup mirrors the panel, chip and settings components, so update
+  it when they change. It uses sample data only.
 - To add an RPC: extend `src/types.ts`, add the schema in `src/rpc.ts`, register it in
   `src/server/index.ts`, and call it through `src/gui/data.ts`. Validate every input.
 - Keep the privacy table true: no new hosts, no credential logging, no model-callable tools or
@@ -227,7 +241,7 @@ and a second account, then verify the tab, chip hover, range buttons, account sw
 
 ```text
 .github/                  CI and issue templates
-docs/usage-panel.png      README preview (sample data)
+docs/                     README screenshots (sample data)
 scripts/build.mjs         tsc for the server + Vite for the window bundle
 scripts/preview.mjs       static preview renderer
 src/

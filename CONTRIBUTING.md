@@ -29,7 +29,7 @@ Requires Node.js 22.12+ (Vite 7) and pnpm 11.
 pnpm install       # installs dev deps
 pnpm typecheck
 pnpm build
-pnpm preview       # preview/panel.html, fixed sample data, no network
+pnpm preview       # preview/*.html, fixed sample data, no network
 pnpm pack:check    # inspect the npm tarball
 ```
 
@@ -45,8 +45,8 @@ npm tarball.
   Solid, Effect and `@opencode/plugin/gui` stay external. Window changes reload when rebuilt.
 - `src/rpc.ts` is the contract, with a Standard Schema check for every input. `src/types.ts` holds
   the shared shapes. `src/gui/data.ts` holds the window's calls in signals.
-- `scripts/preview.mjs` mirrors the panel markup with sample data. It is a visual aid, not a
-  second implementation; update it when the panel changes.
+- `scripts/preview.mjs` mirrors the panel, chip and settings markup with sample data. It is a visual
+  aid, not a second implementation; update it when those surfaces change.
 
 To add an RPC: add the shape to `types.ts`, the schema and method to `rpc.ts`, the handler to
 `server/index.ts`, and the caller to `gui/data.ts`.

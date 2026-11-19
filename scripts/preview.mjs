@@ -352,4 +352,167 @@ ${readCss()}
 </html>
 `;
 writeFileSync(path.join(root, "preview/hero.html"), hero, "utf8");
-console.log("wrote preview/panel.html", report.days.length, "days", report.models.length, "models");
+
+// A close-up of the chip with its hover list, for the README.
+const chipTip = `<div class="ou-chip-tip">
+  <div class="ou-chip-tip-title">OpenCode Go accounts</div>
+  <table class="ou-chip-table">
+    <thead><tr><th scope="col">Account</th><th scope="col" class="ou-chip-num">5h</th><th scope="col" class="ou-chip-num">7d</th><th scope="col" class="ou-chip-num">1mo</th></tr></thead>
+    <tbody>
+      <tr class="ou-chip-row-on"><th scope="row" class="ou-chip-account">Personal</th><td class="ou-chip-num">14%</td><td class="ou-chip-num">9%</td><td class="ou-chip-num ou-warn">94%</td></tr>
+      <tr><th scope="row" class="ou-chip-account">Work · Console</th><td class="ou-chip-num ou-full">100%</td><td class="ou-chip-num">42%</td><td class="ou-chip-num">63%</td></tr>
+      <tr><th scope="row" class="ou-chip-account">Go API key</th><td class="ou-chip-num">3%</td><td class="ou-chip-num">8%</td><td class="ou-chip-num">12%</td></tr>
+    </tbody>
+  </table>
+</div>`;
+
+const chip = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Limits chip preview</title>
+<style>
+  body { margin: 0; padding: 24px; background: #0a0a0a; color: #ededed; font-family: var(--font-family-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif); }
+  .chip-shot { display: inline-block; width: 520px; padding: 14px; box-sizing: border-box;
+    border: 1px solid #262626; border-radius: 14px; background: #0c0c0c;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .55); }
+  .ou-iconbtn { color: #8a8a8a; font-size: 14px; }
+  .ou-strip-demo { display: flex; align-items: center; gap: 6px; height: 32px; margin-bottom: 0; box-sizing: border-box;
+    padding: 0 8px; border: 1px solid #262626; border-radius: 8px; background: #101010; }
+  .ou-strip-demo .ou-root { gap: 0; }
+  .ou-tab { color: #8a8a8a; font-size: 12px; padding: 3px 8px; border-radius: 5px; background: #171717; }
+  .ou-tab-on { color: #ededed; }
+  .ou-strip-gap { flex: 1; }
+  .ou-plus { color: #8a8a8a; font-size: 15px; width: 20px; text-align: center; }
+  .chip-tip-wrap { display: flex; justify-content: flex-end; padding: 12px 10px 2px 0; }
+  .chip-tip { width: 238px; padding: 9px 11px; box-sizing: border-box;
+    border: 1px solid #333333; border-radius: 10px; background: #1c1c1c;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .5); }
+${readCss()}
+</style>
+</head>
+<body>
+  <div class="chip-shot" id="shot">
+    ${strip(492).replace('stroke-dashoffset:32.83', 'stroke-dashoffset:29.72').replace('5% used', '14% used')}
+    <div class="chip-tip-wrap"><div class="chip-tip">${chipTip}</div></div>
+  </div>
+</body>
+</html>
+`;
+writeFileSync(path.join(root, "preview/chip.html"), chip, "utf8");
+
+const settingsRows = [
+  {
+    title: "Usage tab in the side panel",
+    desc: "A tab beside each session with the Limits card, ranges, totals and a per-model list. Picking an account in the card switches OpenCode's active credential.",
+    control: '<span class="switch"><i></i></span>',
+  },
+  {
+    title: "Limits chip beside the new-tab button",
+    desc: "A small ring at the end of the tab strip, next to the new-tab button. Rest the pointer on it to see the 5-hour, weekly and monthly share of every account with a Go plan; click it to open the tab.",
+    control: '<span class="switch"><i></i></span>',
+  },
+  {
+    title: "Window the chip shows",
+    desc: "Which limit the ring measures. The hover list always shows all three.",
+    control: '<span class="select">Rolling 5h <b>⌄</b></span>',
+  },
+];
+
+const settings = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Usage settings preview</title>
+<style>
+  body { margin: 0; padding: 24px; background: #0a0a0a; color: #ededed; font-family: var(--font-family-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif); }
+  .settings-shot { display: flex; width: 980px; height: 680px; box-sizing: border-box; overflow: hidden;
+    border: 1px solid #262626; border-radius: 14px; background: #0c0c0c;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .55); }
+  .settings-nav { width: 224px; flex: none; padding: 18px 12px; box-sizing: border-box;
+    background: #0f0f0f; border-right: 1px solid #242424; }
+  .settings-brand { padding: 6px 10px 16px; font-size: 13px; font-weight: 600; color: #ededed; }
+  .settings-navitem { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 7px;
+    color: #9a9a9a; font-size: 13px; }
+  .settings-navitem.on { background: #1b1b1b; color: #ededed; }
+  .settings-dot { width: 6px; height: 6px; border-radius: 50%; background: #43d17a; }
+  .settings-main { flex: 1; min-width: 0; padding: 26px 34px; box-sizing: border-box; }
+  .settings-main h1 { margin: 0 0 6px; font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+  .settings-lede { margin: 0 0 22px; max-width: 650px; color: #8f8f8f; font-size: 13px; line-height: 1.5; }
+  .settings-section { margin: 0 0 18px; }
+  .settings-section h2 { margin: 0 0 3px; color: #b8b8b8; font-size: 12px; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 28px;
+    padding: 11px 0; border-top: 1px solid #222222; }
+  .settings-row:last-child { border-bottom: 1px solid #222222; }
+  .settings-title { color: #ededed; font-size: 13px; }
+  .settings-desc { margin-top: 3px; max-width: 500px; color: #8a8a8a; font-size: 12px; line-height: 1.45; }
+  .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex: none;
+    border-radius: 999px; background: #43d17a; }
+  .switch i { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: #0c0c0c; }
+  .select { display: inline-flex; align-items: center; justify-content: space-between; gap: 14px;
+    min-width: 150px; padding: 7px 10px; border: 1px solid #333333; border-radius: 7px;
+    background: #171717; color: #ededed; font-size: 12px; }
+  .select b { color: #8a8a8a; font-weight: 400; }
+  .settings-plain { color: #8a8a8a; font-size: 12px; line-height: 1.45; }
+${readCss()}
+</style>
+</head>
+<body>
+  <div class="settings-shot" id="shot">
+    <aside class="settings-nav">
+      <div class="settings-brand">Settings</div>
+      <div class="settings-navitem">General</div>
+      <div class="settings-navitem">Appearance</div>
+      <div class="settings-navitem">Providers</div>
+      <div class="settings-navitem">Extensions</div>
+      <div class="settings-navitem on"><span class="settings-dot"></span>Usage</div>
+      <div class="settings-navitem">Advanced</div>
+    </aside>
+    <main class="settings-main">
+      <h1>Usage</h1>
+      <p class="settings-lede">OpenCode Go usage and plan limits for OpenCode Desktop, read from the Console. No tools for the model and no auto-update.</p>
+
+      <section class="settings-section">
+        <h2>Surfaces</h2>
+        ${settingsRows
+          .map(
+            (row) =>
+              `<div class="settings-row"><div><div class="settings-title">${row.title}</div><div class="settings-desc">${row.desc}</div></div>${row.control}</div>`,
+          )
+          .join("")}
+      </section>
+
+      <section class="settings-section">
+        <h2>Defaults</h2>
+        <div class="settings-row">
+          <div><div class="settings-title">Range the tab opens with</div><div class="settings-desc">You can switch ranges inside the tab at any time.</div></div>
+          <span class="select">7d <b>⌄</b></span>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>Data</h2>
+        <div class="settings-row">
+          <div><div class="settings-title">Source</div><div class="settings-plain">Usage and limits are read from the OpenCode Console with the credential OpenCode already stores. Nothing is read from this machine, and no secret is logged or copied.</div></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-title">Privacy</div><div class="settings-plain">The only network calls go to OpenCode's Console, for the selected account. Choosing an account asks OpenCode to activate that credential.</div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+`;
+writeFileSync(path.join(root, "preview/settings.html"), settings, "utf8");
+
+console.log(
+  "wrote preview/panel.html, hero.html, chip.html, settings.html",
+  report.days.length,
+  "days",
+  report.models.length,
+  "models",
+);
+

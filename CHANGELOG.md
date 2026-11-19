@@ -17,7 +17,8 @@ First public release.
   that have a Go plan.
 - Settings page for surface switches, default range and the chip's window.
 - English and Vietnamese copy.
-- Static preview renderer (`pnpm preview`) and the README screenshot.
+- Static preview renderer (`pnpm preview`) and README screenshots for the side panel, limits chip
+  and Settings page.
 
 ### Security
 
