@@ -7,3 +7,7 @@ minimumReleaseAgeExclude:
   - '@opencode/protocol@2.3.2'
   - '@opencode/schema@2.3.2'
   - '@opencode/util@2.3.2'
+
+# Vite's bundler needs its postinstall, which pnpm 11 otherwise blocks in CI.
+onlyBuiltDependencies:
+  - esbuild
