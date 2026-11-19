@@ -69,15 +69,48 @@ uses the Solid and Effect instances the Desktop app already provides.
 
 ## Install
 
+One command. It installs into your **global** OpenCode setup, so every window has it, and needs
+no `opencode.json` edit.
+
+### One command
+
+**Windows** (PowerShell):
+
+```powershell
+irm https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/latest/download/install.ps1 | iex
+```
+
+**macOS, Linux, WSL**:
+
+```sh
+curl -fsSL https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/latest/download/install.sh | sh
+```
+
+The script downloads the built plugin into `~/.config/opencode/plugins/opencode-usage-gui`, which
+OpenCode loads automatically. If Windows says a file is in use, close Desktop and run it again.
+
 ### From npm
+
+Available once the first npm release is published; until then use the command above.
 
 ```sh
 opencode plugin add opencode-usage-gui
 ```
 
-> Until the first npm release lands, build a checkout and add its directory below.
+Then open OpenCode Desktop. **Settings → Extensions → Plugins** lists `usage-desktop` with its
+switch on. If you previously added the plugin to `opencode.json` by hand, remove that entry so it
+does not load twice.
 
-Or add it to the **global** config, `~/.config/opencode/opencode.json(c)`:
+| Task | Command |
+| --- | --- |
+| Update | Run the same install command again. |
+| Check | `opencode plugin list` |
+| Update from npm | `opencode plugin update opencode-usage-gui` |
+| Uninstall | `opencode plugin remove opencode-usage-gui`, or delete the plugin folder. |
+
+### Manual npm entry
+
+If you would rather edit the global config yourself, `~/.config/opencode/opencode.json(c)`:
 
 ```jsonc
 {
@@ -85,10 +118,6 @@ Or add it to the **global** config, `~/.config/opencode/opencode.json(c)`:
   "plugins": ["opencode-usage-gui"]
 }
 ```
-
-Restart OpenCode Desktop. **Settings → Extensions → Plugins** should list `usage-desktop` with its
-switch on. Use `opencode plugin list`, `opencode plugin check`, `opencode plugin update` and
-`opencode plugin remove opencode-usage-gui` to manage it later.
 
 ### From a checkout (unreleased code)
 
@@ -201,7 +230,7 @@ injection, and the TUI/CLI parts.
 
 | Symptom | Check |
 | --- | --- |
-| Plugin is not under Settings → Extensions → Plugins | Is it in the **global** `opencode.json(c)`? Did you restart Desktop? Run `opencode plugin list`. Desktop lists plugins when its own server is selected. |
+| Plugin is not under Settings → Extensions → Plugins | Check the global folder `~/.config/opencode/plugins/opencode-usage-gui`, or the global `opencode.json(c)`. Run `opencode plugin list`. Desktop lists plugins when its own server is selected. |
 | “Sign in to OpenCode Go” | The selected account needs a Console sign-in. Sign in through OpenCode, or pick a Console account in the Limits card. |
 | Limits show, history does not | That account is a Go **API key**; history needs a Console sign-in. |
 | “This account has no active OpenCode Go plan” | The credential is not subscribed, or the picker is on the wrong account. |
@@ -246,8 +275,10 @@ and a second account, then verify the tab, chip hover, range buttons, account pi
 ## Project structure
 
 ```text
-.github/                  CI and issue templates
+.github/                  CI, release workflow and issue templates
 docs/                     README screenshots (sample data)
+install.ps1               one-command installer for Windows
+install.sh                one-command installer for macOS and Linux
 scripts/build.mjs         tsc for the server + Vite for the window bundle
 scripts/preview.mjs       static preview renderer
 src/

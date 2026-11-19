@@ -21,6 +21,10 @@ First public release.
 - English and Vietnamese copy.
 - Static preview renderer (`pnpm preview`) and README screenshots for the side panel, limits chip
   and Settings page.
+- One-command installers (`install.ps1`, `install.sh`) that place the built plugin in the global
+  OpenCode plugin folder, so no config edit is needed.
+- Tag-driven release workflow: GitHub release with the built plugin and installers, plus npm
+  publish when `NPM_TOKEN` is set.
 
 ### Security
 

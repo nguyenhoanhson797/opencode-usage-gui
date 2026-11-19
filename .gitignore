@@ -1,6 +1,7 @@
 node_modules/
 dist/
 preview/
+stage/
 coverage/
 *.log
 *.tgz
