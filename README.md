@@ -72,7 +72,15 @@ uses the Solid and Effect instances the Desktop app already provides.
 One command. It installs into your **global** OpenCode setup, so every window has it, and needs
 no `opencode.json` edit.
 
-### One command
+### npm
+
+```sh
+opencode plugin add opencode-usage-gui
+```
+
+The package is published with a signed provenance statement and installs no runtime dependencies.
+
+### GitHub release, no npm account
 
 **Windows** (PowerShell):
 
@@ -86,20 +94,14 @@ irm https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/latest/down
 curl -fsSL https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/latest/download/install.sh | sh
 ```
 
-The script downloads the built plugin into `~/.config/opencode/plugins/opencode-usage-gui`, which
+The script downloads the same build into `~/.config/opencode/plugins/opencode-usage-gui`, which
 OpenCode loads automatically. If Windows says a file is in use, close Desktop and run it again.
 
-### From npm
+### After installing
 
-Available once the first npm release is published; until then use the command above.
-
-```sh
-opencode plugin add opencode-usage-gui
-```
-
-Then open OpenCode Desktop. **Settings → Extensions → Plugins** lists `usage-desktop` with its
-switch on. If you previously added the plugin to `opencode.json` by hand, remove that entry so it
-does not load twice.
+Open OpenCode Desktop. **Settings → Extensions → Plugins** lists `usage-desktop` with its switch
+on. If you previously added the plugin to `opencode.json` by hand, remove that entry so it does
+not load twice.
 
 | Task | Command |
 | --- | --- |
