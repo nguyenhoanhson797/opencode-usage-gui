@@ -74,12 +74,17 @@ To add an RPC: add the shape to `types.ts`, the schema and method to `rpc.ts`, t
 
 ## Releasing
 
+Releases are tag-driven: a `vX.Y.Z` tag runs the Release workflow, which builds the plugin,
+attaches the zip, tarball and both installers to the GitHub release, and publishes to npm.
+
 1. Update `CHANGELOG.md` and bump `version` in `package.json`.
 2. Run `pnpm typecheck && pnpm build && pnpm pack:check`; inspect the file list and sizes.
-3. `npm publish` (run `npm login` first). The `prepack` script rebuilds and typechecks, and
-   `publishConfig` makes the package public.
-4. Tag the release (`git tag vX.Y.Z && git push --tags`) and create a GitHub release from the tag.
-5. Install the published version in a fresh profile and run the manual check above.
+3. Commit, then push a matching tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+4. The workflow checks that the tag matches `package.json`, publishes the GitHub release, and runs
+   `npm publish` when the repository has an `NPM_TOKEN` secret (an npm automation token). Without
+   the secret, the GitHub release and installers still ship.
+5. Install the release with the one-command installer in a fresh profile and run the manual check
+   above.
 
 ## Manual check before a release
 
