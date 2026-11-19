@@ -57,7 +57,6 @@ jobs:
           cp -r dist package.json README.md CHANGELOG.md LICENSE stage/opencode-usage-gui/
           (cd stage && zip -qr ../opencode-usage-gui.zip opencode-usage-gui)
           (cd stage && tar -czf ../opencode-usage-gui.tar.gz opencode-usage-gui)
-          cp install.ps1 install.sh .
           ls -lh opencode-usage-gui.zip opencode-usage-gui.tar.gz
 
       - name: Publish the GitHub release
