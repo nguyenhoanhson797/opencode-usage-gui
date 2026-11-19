@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-11-19
+
+Documentation-only release.
+
+### Changed
+
+- README install section leads with `opencode plugin add opencode-usage-gui` now that the package is
+  published, and keeps the release installer as the no-npm fallback.
+
 ## [0.1.0] — 2026-11-19
 
 First public release.
@@ -40,4 +49,5 @@ First public release.
 - Removed the decorative chevrons from the Limits, Totals and Models cards.
 - Forked from `opencode-quota` and reduced to the OpenCode Go Desktop surface.
 
+[0.1.1]: https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/nguyenhoanhson797/opencode-usage-gui/releases/tag/v0.1.0

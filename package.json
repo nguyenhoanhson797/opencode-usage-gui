@@ -1,6 +1,6 @@
 {
   "name": "opencode-usage-gui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "OpenCode Go usage and plan limits in an OpenCode Desktop side panel, read from the Console. No local database, no AI tools.",
   "license": "MIT",
