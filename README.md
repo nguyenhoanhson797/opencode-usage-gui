@@ -233,6 +233,7 @@ injection, and the TUI/CLI parts.
 | Symptom | Check |
 | --- | --- |
 | Plugin is not under Settings → Extensions → Plugins | Check the global folder `~/.config/opencode/plugins/opencode-usage-gui`, or the global `opencode.json(c)`. Run `opencode plugin list`. Desktop lists plugins when its own server is selected. |
+| `opencode` is not recognized (Windows) | Desktop ships the CLI inside the app: `%LOCALAPPDATA%\Programs\@opencode-aidesktop\resources\opencode-cli.exe`. Put an `opencode.cmd` shim for it in a folder on your `PATH`, or use the release installer, which needs no CLI. |
 | “Sign in to OpenCode Go” | The selected account needs a Console sign-in. Sign in through OpenCode, or pick a Console account in the Limits card. |
 | Limits show, history does not | That account is a Go **API key**; history needs a Console sign-in. |
 | “This account has no active OpenCode Go plan” | The credential is not subscribed, or the picker is on the wrong account. |
